@@ -1,0 +1,11 @@
+[Unit]
+Description=Script to start all ruby on rails apps
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/home/deploy/puma_servers/base_auto_load
+TimeoutStartSec=0
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,80 @@
+#!/bin/sh
+#
+# DANGER!! DON´T CHANGE THIS FILE!!!!
+#
+# chkconfig:   - 85 15
+
+PUMA_CONFIG="$APP_DIR/current/config/puma.rb"
+PUMA_PID_FILE="$APP_DIR/shared/tmp/pids/server.pid"
+PUMA_SOCKET="unix://$APP_DIR/shared/tmp/sockets/server.sock"
+
+if [ -f $PUMA_PID_FILE ]; then
+    PUMA_PID=`cat $PUMA_PID_FILE`
+else
+    PUMA_PID='-1'
+fi
+
+start() {
+    if [ -d "/proc/$PUMA_PID" ]; then
+        echo "Server already is running"
+    else
+        echo "Starting sever..."
+
+        # Commands to run with bash login
+        local RVMSC="rvm use $RUBY_VERSION" # Changing ruby version to be compatible with the project
+        local APPSC="cd $APP_DIR/current" # Need opens app folder to run 'bundle exec' so it can found the project Gemfile
+        # Script to start puma
+        local PUMA="RACK_ENV=production RUBY_GC_HEAP_GROWTH_MAX_SLOTS=10000 bundle exec puma -C $PUMA_CONFIG -b $PUMA_SOCKET --pidfile $PUMA_PID_FILE -d"
+        # Running all scripts above together
+        local SCRIPTSSC="/bin/bash --login -c \"$RVMSC; $APPSC; $PUMA\""
+        su - deploy -c "$SCRIPTSSC"
+    fi
+}
+
+stop() {
+    if ! kill $PUMA_PID > /dev/null 2>&1; then
+        echo "Server is not running"
+    else
+        echo "Server stopped"
+    fi
+}
+
+reload() {
+    if [ -d "/proc/$PUMA_PID" ]; then
+       echo "Reloading..."
+       touch "$APP_DIR/shared/tmp/restart"
+       echo 'Success!'
+    else
+        echo "Server is not running"
+    fi
+}
+
+status() {
+    if [ -d "/proc/$PUMA_PID" ]; then
+        echo "$PUMA_PID"
+       echo "Server is up"
+    else
+        echo "Server is not running"
+    fi
+}
+
+case "$1" in
+    start)
+        $1
+        ;;
+    stop)
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    reload)
+        $1
+        ;;
+    status)
+        $1
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|status|reload}"
+        exit 2
+esac
