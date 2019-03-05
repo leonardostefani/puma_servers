@@ -9,7 +9,7 @@
   
     chmod 755 puma_servers/base
     chmod 755 puma_servers/base_auto_load
-    chmod 755 puma_servers/base/leo.com.br.config
+    chmod 755 puma_servers/servers.d/leo.com.br.config
   3 - Service
   
     sudo cp puma_servers/puma.service /usr/lib/systemd/system/puma.service
