@@ -6,4 +6,4 @@
 
 # Include here all your servers script to load when the server boot
 
-sh /home/deploy/puma_servers/servers.d/leo.com.br.config start
+sh /home/deploy/puma_servers/servers.d/leo.com.br.config start > /var/tmp/script.out
